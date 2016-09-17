@@ -1,0 +1,12 @@
+{
+    "phantomjs":{
+        "server":{
+            "port":8082
+        }
+    },
+    "app":{
+        "server":{
+            "port":8080
+        }
+    }
+}

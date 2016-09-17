@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>JSChecker</title>
+    <!-- <script src='https://www.google.com/recaptcha/api.js'></script> -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+</head>
+
+<body>
+    <div class="container">
+
+        <div class="row">
+            <div class="col-lg-1"></div>
+            <div class="col-lg-10">
+                <h1>JS Checker</h1>
+                <hr>
+                <form name="form1" id="form1">
+                    <div class="input-group">
+                        <input type="text" id="url" name="url" class="form-control" placeholder="Enter Javascript URL...">
+                        <span class="input-group-btn">
+                    <button class="btn btn-primary" id="send" type="button">Check</button>
+                  </span>
+                    </div>
+                </form>
+                <br>
+
+                <div class="progress">
+                  <div id="progressbar" class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="0"
+                  aria-valuemin="0" aria-valuemax="100" style="width:0%">
+                  </div>
+                </div>
+
+                <div id="result"></div>
+            <br>
+
+
+            </div>
+            <div class="col-lg-1"></div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+
+    <script>
+
+        function updateProgessBar(percentage){
+            var pbar = document.getElementById("progressbar");
+            pbar.setAttribute("aria-valuenow", percentage);
+            pbar.setAttribute("style", "width:"+percentage+"%");
+            pbar.innerHTML = percentage+"% Complete";
+        }
+
+        document.getElementById('send').addEventListener('click', function(event) {
+            updateProgessBar(0);
+            var url = document.getElementById('url').value;
+
+            document.getElementById('result').innerHTML = "";
+
+            if (!url) {
+                alert('Improper URL');
+            } else {
+                updateProgessBar(20);
+                document.getElementById('result').innerHTML = "<h3>Sub Resource Integrity</h3>";
+                $.get("/evaluate?url=" + url, function(data) {
+
+                    console.log(data);
+                    updateProgessBar(50);
+
+                    var tableObject = document.createElement('table');
+
+                    var att = document.createAttribute("class");
+                    att.value = "table";
+                    tableObject.setAttributeNode(att);
+
+                    var thead = document.createElement('thead');
+                    var attrclass = document.createAttribute("class");
+                    attrclass.value = "bg-primary";
+                    thead.setAttributeNode(attrclass);
+
+                    var headrow = document.createElement('tr');
+                    var col1 = document.createElement('th');
+                    col1.innerHTML = "#";
+                    var col2 = document.createElement('th');
+                    col2.innerHTML = "URL";
+                    var col3 = document.createElement('th');
+                    col3.innerHTML = "Integrity";
+                    var col4 = document.createElement('th');
+                    col4.innerHTML = "Supported Domains";
+
+                    headrow.appendChild(col1);
+                    headrow.appendChild(col2);
+                    headrow.appendChild(col3);
+                    headrow.appendChild(col4);
+
+                    thead.appendChild(headrow);
+
+                    updateProgessBar(70);
+
+                    var tbody = document.createElement('tbody');
+
+                    for(var i = 0; i < data.length; i++){
+
+                        var row = document.createElement('tr');
+
+                        var col4 = document.createElement('td');
+
+                        if(data[i].headersInfo.status === 0){
+                            var att = document.createAttribute("class");
+                            att.value = "bg-danger";
+                            row.setAttributeNode(att);
+                            col4.innerHTML = 'None';
+                        }else if(data[i].headersInfo.status === 1){
+                            var att = document.createAttribute("class");
+                            att.value = "bg-success";
+                            row.setAttributeNode(att);
+                            col4.innerHTML = 'All Domains';
+                        }else{
+                            var att = document.createAttribute("class");
+                            att.value = "bg-warning";
+                            row.setAttributeNode(att);
+                            col4.innerHTML = data[i].headersInfo.allowedDomains;
+                        }
+
+                        var col1 = document.createElement('td');
+                        col1.innerHTML = i+1;
+                        var col2 = document.createElement('td');
+                        col2.innerHTML = data[i].url;
+                        var col3 = document.createElement('td');
+                        col3.innerHTML = data[i].integrity;
+
+                        row.appendChild(col1);
+                        row.appendChild(col2);
+                        row.appendChild(col3);
+                        row.appendChild(col4);
+
+                        tbody.appendChild(row);
+
+                    }
+
+                    tableObject.appendChild(thead);
+                    tableObject.appendChild(tbody);
+
+                    document.getElementById('result').appendChild(tableObject);
+
+                    updateProgessBar(100);
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>
