@@ -10,8 +10,8 @@
         },
         "redis":{
             "authPassword": "",
-            "port": 7386,
-            "host": "104.236.5.69",
+            "port": 6379,
+            "host": "127.0.0.1",
             "keyPrefix": "jschecker",
             "taskqueue": "tasks",
             "defaultValueForQueue" : "Queued",
