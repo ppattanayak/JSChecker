@@ -3,11 +3,14 @@ var path = require('path');
 var logger = require('morgan');
 var fs = require('fs');
 var bodyParser = require('body-parser');
+var job = require('./src/events');
 var temp = 'phantomjs/temp';
+
 // var db = require('./db');
 
 var routes = require('./routes/index');
 var evaluate = require('./routes/evaluate');
+var status = require('./routes/status');
 
 var app = express();
 
@@ -20,7 +23,9 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
+app.use('/info/:id', routes);
 app.use('/evaluate', evaluate);
+app.use('/status', status);
 
 // init.initial();
 
@@ -53,5 +58,9 @@ app.use(function(err, req, res, next) {
 if (!fs.existsSync(temp)){
     fs.mkdirSync(temp);
 }
+
+setInterval(function(){
+    job.start();
+}, 5000);
 
 module.exports = app;

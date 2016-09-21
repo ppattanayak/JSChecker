@@ -7,6 +7,17 @@
     "app":{
         "server":{
             "port":8080
+        },
+        "redis":{
+            "authPassword": "",
+            "port": 7386,
+            "host": "104.236.5.69",
+            "keyPrefix": "jschecker",
+            "taskqueue": "tasks",
+            "defaultValueForQueue" : "Queued",
+            "processingText": "Processing",
+            "operationStatusText": "OperationStatus",
+            "currentObjectName": "currentObject"
         }
     }
 }

@@ -21,6 +21,8 @@ JSChecker is a tool to check for various javascript related security requirement
 ### Sub Resource Integrity Check
 As mentioned in the mozilla website, Subresource Integrity (SRI) is a security feature that enables browsers to verify that files they fetch (for example, from a CDN) are delivered without unexpected manipulation. It works by allowing you to provide a cryptographic hash that a fetched file must match.
 
+Most of the tools available in the market check for the integrity of the JS or CSS file you supply them, but JSChecker checks for the integrity of the parent JS and all the other JS that it includes in the page. It also goes deep into the nested JS calls to calculate the end to end integrity.
+
 #### How It helps
 Using Content Delivery Networks (CDNs) to host files such as scripts and stylesheets that are shared among multiple sites can improve site performance and conserve bandwidth. However, using CDNs also comes with a risk, in that if an attacker gains control of a CDN, the attacker can inject arbitrary malicious content into files on the CDN (or replace the files completely) and thus can also potentially attack all sites that fetch files from that CDN.
 

@@ -1,34 +1,41 @@
 var express = require('express');
-var tempServer = require('../phantomjs/server');
-var phchecker = require('../phantomjs/checker');
+var config = require('../config/config.json');
+
+var redis = require('../src/redis');
+var redisVars = {
+    queue: config.app.redis.taskqueue,
+    defaultValueForIds: config.app.redis.defaultValueForQueue
+};
+var randomstring = require('randomstring');
+var id = "";
 
 var router = express.Router();
 
-function stopServer(status, res) {
-    if (status === 'success') {
-        console.log('Stop Server method called with success');
-        tempServer.stopServer();
-    } else {
-        console.log('Stop Server method called with failed status');
-        tempServer.stopServer();
-    }
-
-    phchecker.sricheck.evaluateAllUrls(function(sri){
-        console.log(sri);
-        res.send(sri);
-    });
+function pushToRedis(data, callback){
+    console.log('Pushed ' + data + ' to redis');
+    redis.lpush(redisVars.queue, data, callback);
 }
 
 router.get('/', function(req, res, next) {
     var url = req && req.query && req.query.url;
-    console.log(url);
+    id = randomstring.generate(30) + new Date().getTime();
+    console.log('Random String : ', id);
 
-    tempServer.startServer(function() {
-        phchecker.sricheck.start(url, function(status){
-            stopServer(status, res);
+    var redisData = {};
+        redisData.id = id;
+        redisData.url = url;
+
+    console.log(JSON.stringify(redisData));
+
+    pushToRedis(JSON.stringify(redisData), function(err, result){
+        if(err) console.log(err);
+        console.log('Queue No : ' + result);
+        redis.setData(id, redisVars.defaultValueForIds, function(err, result){
+            if(err) console.log(err);
+            console.log(result);
         });
+        res.send('{"status":true, "queue":"'+result+'", "id":"'+id+'"}');
     });
-
 });
 
 
