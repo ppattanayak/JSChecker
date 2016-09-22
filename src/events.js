@@ -1,7 +1,7 @@
 var redis = require('./redis');
 var tempServer = require('../phantomjs/server');
 var phchecker = require('../phantomjs/checker');
-var config = require('../config/config.json');
+var config = require('./global').config;
 var queue = config.app.redis.Objects.GlobalKeys.taskqueue;
 var intervalObj;
 
@@ -15,15 +15,15 @@ function updateRedis(sri) {
                 if (result) {
                     redis.setData(config.app.redis.Objects.GlobalKeys.currentObjectName, '', function(err, result){
                         if(err) console.log(err);
-                        console.log(result);
+                        console.log('Setting current Object Name to blank: ', result);
                     }); // Removing current Executing Object
                     redis.setData(config.app.redis.Objects.GlobalKeys.operationStatusName, 0, function(err, result){
                         if(err) console.log(err);
-                        console.log(result);
+                        console.log('Setting Operation Status to 0: ', result);
                     }); // Setting current execution status to 0
                     redis.expire(result, config.app.redis.Objects.DefaultTexts.keyLife, function(err, result){
                         if(err) console.log(err);
-                        console.log(result);
+                        console.log('Setting expiry of the key to '+ config.app.redis.Objects.DefaultTexts.keyLife + 's: ', result);
                     }); // Setting key expiry for 24 hours
                     redis.incr(config.app.redis.Objects.GlobalKeys.requestServed, function(err, result){
                         if(err) console.log(err);
@@ -102,6 +102,7 @@ function start() {
 module.exports = {
 
     start: function(){
+        // console.log('Config file used :', app.get('config'));
         redis.getData(config.app.redis.Objects.GlobalKeys.intervalStatusVar, function(err, result){
             if(err) console.log(err);
             if(result === '0'){

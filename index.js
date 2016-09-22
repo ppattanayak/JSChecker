@@ -5,9 +5,10 @@
  */
 
 var app = require('./app');
-var debug = require('debug')('ngec:server');
+var debug = require('debug');
 var http = require('http');
-var config = require('./config/config.json');
+var config = require('./src/global').config;
+// var config = require('./config/config.json');
 
 /**
  * Get port from environment and store in Express.

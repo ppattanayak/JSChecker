@@ -11,14 +11,14 @@
         "redis":{
             "authPassword": "",
             "port": 6379,
-            "host": "",
+            "host": "127.0.0.1",
             "keyPrefix": "jschecker",
             "Objects":{
                 "DefaultTexts":{
                     "defaultValueForQueue" : "Queued",
                     "processingText": "Processing",
                     "resultObjectPrefix": "ID-",
-                    "keyLife": 1000
+                    "keyLife": 86400
                 },
                 "GlobalKeys":{
                     "taskqueue": "tasks",

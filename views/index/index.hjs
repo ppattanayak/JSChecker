@@ -29,10 +29,9 @@
                 </form>
                 <br>
 
-                <div class="progress">
-                    <div id="progressbar" class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width:0%">
-                    </div>
-                </div>
+                <div id="pbar"></div>
+
+                <div id="urlref"></div>
 
                 <div id="result"></div>
                 <div id="output"></div>
@@ -40,7 +39,6 @@
                 <div id="info"></div>
                 <div id="error"></div>
                 <br>
-
 
             </div>
             <div class="col-lg-1"></div>
@@ -51,8 +49,11 @@
 
     <script>
         var interval;
+        var urlRefdiv = '';
 
         if (window.location.pathname.startsWith('/info/')) {
+            document.getElementById('pbar').innerHTML = '<div class="progress"><div id="progressbar" class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width:0%"></div></div>';
+
             var pathname = window.location.pathname;
             var path = pathname.split('/');
 
@@ -242,6 +243,8 @@
                         tableObject.appendChild(thead);
                         tableObject.appendChild(tbody);
 
+                        document.getElementById('urlref').innerHTML = urlRefdiv;
+
                         document.getElementById('output').appendChild(tableObject);
                         document.getElementById('output').appendChild(allCallouts);
 
@@ -252,12 +255,15 @@
             });
         }
 
-        document.getElementById('send').addEventListener('click', function(event) {
+        function start(event){
+            document.getElementById('pbar').innerHTML = '<div class="progress"><div id="progressbar" class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width:0%"></div></div>';
+
             updateProgessBar(0);
             document.getElementById('note').innerHTML = "";
             document.getElementById('info').innerHTML = "";
             document.getElementById('output').innerHTML = "";
             document.getElementById('error').innerHTML = "";
+            document.getElementById('urlref').innerHTML = "";
 
             var url = document.getElementById('url').value;
 
@@ -290,12 +296,14 @@
                             urlForRef += window.location.hostname + "/info/" + queueData.id;
                         }
                         queuecalloutmessage.innerHTML = "<b>Queue: </b> <code id=\"queueno\"> " + queueData.queue + " </code> <br> <br><b>ID: </b> <code> " + queueData.id +
-                            " </code> <br><br> <b>URL (For Future References): </b> <code> " + urlForRef + "</code>";
+                            " </code> <br><br> <b>URL (Valid For: 24 Hrs): </b> <code> " + urlForRef + "</code>";
 
                         queueCallout.appendChild(queuecalloutheader);
                         queueCallout.appendChild(queuecalloutmessage);
 
                         document.getElementById('note').appendChild(queueCallout);
+
+                        urlRefdiv = '<div class="bs-callout bs-callout-info"> <h4>Information</h4> <b>URL (Valid For: 24 Hrs): </b> <code> ' + urlForRef + '</code></div>';
                         checkEvaluationStatus(queueData.id);
 
                         interval = setInterval(function() {
@@ -305,6 +313,12 @@
                     }
                 });
             }
+        }
+
+        document.getElementById('send').addEventListener('click', start);
+        document.getElementById('form1').addEventListener('submit', function(event){
+            event.preventDefault();
+            start(event);
         });
     </script>
 </body>

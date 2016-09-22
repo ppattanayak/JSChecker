@@ -1,13 +1,13 @@
 var express = require('express');
-var config = require('../config/config.json');
-
+var config = require('../src/global').config;
 var redis = require('../src/redis');
 var job = require('../src/events');
+var randomstring = require('randomstring');
+
 var redisVars = {
     queue: config.app.redis.Objects.GlobalKeys.taskqueue,
     defaultValueForIds: config.app.redis.Objects.DefaultTexts.defaultValueForQueue
 };
-var randomstring = require('randomstring');
 var id = "";
 
 var router = express.Router();

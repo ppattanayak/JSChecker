@@ -1,4 +1,4 @@
-var config = require('../config/config.json');
+var config = require('./global').config;
 
 var options = {
     port: config.app.redis.port,

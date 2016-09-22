@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var redis = require('../src/redis');
-var config = require('../config/config.json');
+var config = require('../src/global').config;
 
 var queue = config.app.redis.Objects.GlobalKeys.taskqueue;
 

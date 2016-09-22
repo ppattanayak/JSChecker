@@ -16,6 +16,13 @@ JSChecker is a tool to check for various javascript related security requirement
 
 1. Port (Default : 8080, 8082) : This application uses two ports mentioned. You can change the ports by editing the *config.json* inside the config directory. Make sure the ports are available before you run the application.
 
+2. Redis : Redis configuration is used to manage the redis instance.
+*host* : Redis IP address (127.0.0.1 if running locally)
+*port* : Redis Port
+*authPassword* : Password for connecting to redis.
+*keyPrefix* : All the redis keys will start with this prefix.
+*keyLife* : How long will be key live in memory.
+
 ## Functionalities
 
 ### Sub Resource Integrity Check
