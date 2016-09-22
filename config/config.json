@@ -11,13 +11,23 @@
         "redis":{
             "authPassword": "",
             "port": 6379,
-            "host": "127.0.0.1",
+            "host": "",
             "keyPrefix": "jschecker",
-            "taskqueue": "tasks",
-            "defaultValueForQueue" : "Queued",
-            "processingText": "Processing",
-            "operationStatusText": "OperationStatus",
-            "currentObjectName": "currentObject"
+            "Objects":{
+                "DefaultTexts":{
+                    "defaultValueForQueue" : "Queued",
+                    "processingText": "Processing",
+                    "resultObjectPrefix": "ID-",
+                    "keyLife": 1000
+                },
+                "GlobalKeys":{
+                    "taskqueue": "tasks",
+                    "operationStatusName": "GlobalOperationStatus",
+                    "currentObjectName": "GlobalCurrentObject",
+                    "intervalStatusVar": "GlobalIntervalStatus",
+                    "requestServed" : "GlobalRequestCounter"
+                }
+            }
         }
     }
 }

@@ -12,7 +12,17 @@ var options = {
 
 var Redis = require('ioredis');
 var redis = new Redis(options);
-    redis.set(config.app.redis.operationStatusText, 0);
+    redis.set(config.app.redis.Objects.GlobalKeys.operationStatusName, 0);
+    redis.set(config.app.redis.Objects.GlobalKeys.intervalStatusVar, 0);
+
+redis.get(config.app.redis.Objects.GlobalKeys.requestServed, function(err, result){
+    if(!result){
+        redis.set(config.app.redis.Objects.GlobalKeys.requestServed, 0, function(err, result){
+            if(err) console.log(err);
+            console.log('Setting request server counter to 0 : ', result);
+        });
+    }
+});
 
 module.exports = {
     setData: function(key, value, callback) {
@@ -58,6 +68,16 @@ module.exports = {
     llen: function(key, callback) {
         console.log('Length Data : ' + key);
         redis.llen(key, callback);
+    },
+
+    expire: function(key, time, callback) {
+        console.log('Setting Expire For : ' + key + " to "+ time);
+        redis.expire(key, time, callback);
+    },
+
+    incr: function(key, callback){
+        console.log('Incrementing : ' + key);
+        redis.incr(key, callback);
     }
 
 };

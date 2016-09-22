@@ -2,9 +2,10 @@ var express = require('express');
 var config = require('../config/config.json');
 
 var redis = require('../src/redis');
+var job = require('../src/events');
 var redisVars = {
-    queue: config.app.redis.taskqueue,
-    defaultValueForIds: config.app.redis.defaultValueForQueue
+    queue: config.app.redis.Objects.GlobalKeys.taskqueue,
+    defaultValueForIds: config.app.redis.Objects.DefaultTexts.defaultValueForQueue
 };
 var randomstring = require('randomstring');
 var id = "";
@@ -18,7 +19,7 @@ function pushToRedis(data, callback){
 
 router.get('/', function(req, res, next) {
     var url = req && req.query && req.query.url;
-    id = randomstring.generate(30) + new Date().getTime();
+    id = config.app.redis.Objects.DefaultTexts.resultObjectPrefix+randomstring.generate(30) + new Date().getTime();
     console.log('Random String : ', id);
 
     var redisData = {};
@@ -34,6 +35,7 @@ router.get('/', function(req, res, next) {
             if(err) console.log(err);
             console.log(result);
         });
+        job.start();
         res.send('{"status":true, "queue":"'+result+'", "id":"'+id+'"}');
     });
 });

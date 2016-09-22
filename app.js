@@ -59,8 +59,6 @@ if (!fs.existsSync(temp)){
     fs.mkdirSync(temp);
 }
 
-setInterval(function(){
-    job.start();
-}, 5000);
+job.start();
 
 module.exports = app;

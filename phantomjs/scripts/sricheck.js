@@ -36,7 +36,10 @@ function wgetAndGenerateHash(url, len, callback) {
                     "url": url,
                     "integrity": 'sha384-' + stdout,
                     "headersInfo": headerInformation[url]
-                });
+                }); // Sample Object to Return
+
+                /* {"status":true, "sri":[{"url":"<JS URl>","integrity":"sha384-yGcy15y7ezBTj+bOaB7GnMKa4auQOdAMCIDwZEcjReXG0KL51p1LJPUvA147u05e","headersInfo":{"headers":[{"name":"Date","value":"Wed, 21 Sep 2016 21:06:58 GMT"},{"name":"Server","value":"Apache/2.4.7 (Ubuntu)"},{"name":"Last-Modified","value":"Fri, 02 Sep 2016 22:39:13 GMT"},{"name":"ETag","value":"\"ba-53b8dffe771a0-gzip\""},{"name":"Accept-Ranges","value":"bytes"},{"name":"Vary","value":"Accept-Encoding"},{"name":"Content-Encoding","value":"gzip"},{"name":"Keep-Alive","value":"timeout=5, max=100"},{"name":"Connection","value":"Keep-Alive"},{"name":"Content-Type","value":"application/javascript"}],"status":0,"allowedDomains":"none"}},{"url":"JS URL 2","integrity":"sha384-PELZvjkz6cPUAQaT8DdCeTvtMw2OfoxiYO/paYT5vp6bRXnF06Ka/G3V47lUvWV/","headersInfo":{"headers":[{"name":"Date","value":"Wed, 21 Sep 2016 21:06:58 GMT"},{"name":"Server","value":"Apache/2.4.7 (Ubuntu)"},{"name":"Last-Modified","value":"Fri, 02 Sep 2016 22:38:33 GMT"},{"name":"ETag","value":"\"1d-53b8dfd8d4560\""},{"name":"Accept-Ranges","value":"bytes"},{"name":"Content-Length","value":"29"},{"name":"Keep-Alive","value":"timeout=5, max=99"},{"name":"Connection","value":"Keep-Alive"},{"name":"Content-Type","value":"application/javascript"}],"status":0,"allowedDomains":"none"}}]}*/
+                console.log(sri);
                 fs.unlinkSync(filepath);
                 downloaded += 1;
                 if (downloaded === len) callback('{"status":true, "sri":'+JSON.stringify(sri)+'}');
@@ -81,6 +84,7 @@ module.exports = {
                 });
                 page.on('onResourceReceived', function(data, networkRequest) {
                     if (data.url !== host + url && (data.url.endsWith('.js') || data.url.endsWith('.css'))) {
+                        console.log('+++++++++++++++++++++++++', data);
                         var headers = data.headers;
                         var info = {};
                         info.headers = headers;

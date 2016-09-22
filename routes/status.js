@@ -3,7 +3,7 @@ var router = express.Router();
 var redis = require('../src/redis');
 var config = require('../config/config.json');
 
-var queue = config.app.redis.taskqueue;
+var queue = config.app.redis.Objects.GlobalKeys.taskqueue;
 
 function checkLrange(id, res){
     redis.lrange(queue, function(err, result){
@@ -31,7 +31,7 @@ router.get('/:id', function(req, res, next) {
             redis.getData(id, function(err, result){
                 if(err) console.log(err);
                 console.log(result);
-                if(result && result !== config.app.redis.defaultValueForQueue && result !== config.app.redis.processingText){
+                if(result && result !== config.app.redis.Objects.DefaultTexts.defaultValueForQueue && result !== config.app.redis.Objects.DefaultTexts.processingText){
                     res.send(result);
                 }else{
                     checkLrange(id, res);

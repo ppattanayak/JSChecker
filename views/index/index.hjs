@@ -35,7 +35,10 @@
                 </div>
 
                 <div id="result"></div>
-                    <div id="info"></div>
+                <div id="output"></div>
+                <div id="note"></div>
+                <div id="info"></div>
+                <div id="error"></div>
                 <br>
 
 
@@ -47,9 +50,9 @@
     <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
 
     <script>
-        var globalObjStatus = 0;
+        var interval;
 
-        if(window.location.pathname.startsWith('/info/')){
+        if (window.location.pathname.startsWith('/info/')) {
             var pathname = window.location.pathname;
             var path = pathname.split('/');
 
@@ -63,67 +66,74 @@
             pbar.innerHTML = percentage + "% Complete";
         }
 
-        function checkEvaluationStatus(id){
+        function checkEvaluationStatus(id) {
 
-                $.get("/status/"+id, function(data) {
+            $.get("/status/" + id, function(data) {
 
-                    console.log(data);
-                    data = JSON.parse(data);
+                console.log(data);
+                data = JSON.parse(data);
 
-                    if (data && data.status === false) {
+                if (data && data.status === false) {
 
-                        document.getElementById('info').innerHTML = "";
-                        var callout = document.createElement('div');
-                        var calloutatt = document.createAttribute("class");
-                        calloutatt.value = "bs-callout bs-callout-danger";
-                        callout.setAttributeNode(calloutatt);
+                    window.clearInterval(interval);
+                    document.getElementById('error').innerHTML = "";
+                    document.getElementById('info').innerHTML = "";
+                    document.getElementById('note').innerHTML = "";
+                    var callout = document.createElement('div');
+                    var calloutatt = document.createAttribute("class");
+                    calloutatt.value = "bs-callout bs-callout-danger";
+                    callout.setAttributeNode(calloutatt);
 
-                        var calloutheader = document.createElement('h4');
-                        calloutheader.innerHTML = "Error ";
+                    var calloutheader = document.createElement('h4');
+                    calloutheader.innerHTML = "Error ";
 
-                        var calloutmessage = document.createElement('p');
-                        calloutmessage.innerHTML = "<b>Note:</b> <code> " + data.message + "<br>";
+                    var calloutmessage = document.createElement('p');
+                    calloutmessage.innerHTML = "<b>Note:</b> <code> " + data.message + "<br>";
 
-                        if (data.invalidurls) {
-                            for (var i = 0; i < data.invalidurls.length; i++) {
-                                calloutmessage.innerHTML += '<br>' + data.invalidurls[i];
-                            }
+                    if (data.invalidurls) {
+                        for (var i = 0; i < data.invalidurls.length; i++) {
+                            calloutmessage.innerHTML += '<br>' + data.invalidurls[i];
                         }
+                    }
 
-                        callout.appendChild(calloutheader);
-                        callout.appendChild(calloutmessage);
+                    callout.appendChild(calloutheader);
+                    callout.appendChild(calloutmessage);
 
-                        document.getElementById('info').appendChild(callout);
+                    document.getElementById('error').appendChild(callout);
+                    updateProgessBar(100);
 
-                    }else if(data && data.status === 'info'){
+                } else if (data && data.status === 'info') {
+                    document.getElementById('info').innerHTML = "";
+
+                    var callout = document.createElement('div');
+                    var calloutatt = document.createAttribute("class");
+                    calloutatt.value = "bs-callout bs-callout-info";
+                    callout.setAttributeNode(calloutatt);
+
+                    var calloutheader = document.createElement('h4');
+                    calloutheader.innerHTML = "Processing...";
+
+                    var calloutmessage = document.createElement('p');
+                    calloutmessage.innerHTML = "<b>Note:</b> <code> " + data.message + "<br>";
+
+                    callout.appendChild(calloutheader);
+                    callout.appendChild(calloutmessage);
+
+                    document.getElementById('info').appendChild(callout);
+                    document.getElementById('queueno').innerHTML = "<code>" + data.queue + "</code>";
+
+                    var currentProgressBarValue = parseInt(document.getElementById('progressbar').innerHTML.split('%')[0]);
+                    var progressBarValue = currentProgressBarValue + ((98 - currentProgressBarValue) / data.queue);
+                    updateProgessBar(progressBarValue.toFixed(2));
+
+                } else if (data && data.status === true) {
+
+                    if(document.getElementById('output').innerHTML === "" && document.getElementById('error').innerHTML === ""){
+                        window.clearInterval(interval);
                         document.getElementById('info').innerHTML = "";
-
-                        var callout = document.createElement('div');
-                        var calloutatt = document.createAttribute("class");
-                        calloutatt.value = "bs-callout bs-callout-info";
-                        callout.setAttributeNode(calloutatt);
-
-                        var calloutheader = document.createElement('h4');
-                        calloutheader.innerHTML = "Processing...";
-
-                        var calloutmessage = document.createElement('p');
-                        calloutmessage.innerHTML = "<b>Note:</b> <code> " + data.message + "<br>";
-
-                        callout.appendChild(calloutheader);
-                        callout.appendChild(calloutmessage);
-
-                        document.getElementById('info').appendChild(callout);
-                        document.getElementById('queueno').innerHTML = "<code>"+data.queue+"</code>";
-
-                        var currentProgressBarValue = parseInt(document.getElementById('progressbar').innerHTML.split('%')[0]);
-                        var progressBarValue =  currentProgressBarValue + ( (98 - currentProgressBarValue)/ data.queue);
-                        updateProgessBar(progressBarValue.toFixed(2));
-
-                    }else if(data && data.status === true){
-
-                        globalObjStatus = 1;
-                        document.getElementById('info').innerHTML = "";
-                        document.getElementById('result').innerHTML = "<h3>Sub Resource Integrity</h3>";
+                        document.getElementById('note').innerHTML = "";
+                        document.getElementById('error').innerHTML = "";
+                        document.getElementById('output').innerHTML = "<h3>Sub Resource Integrity</h3>";
                         data = data.sri;
 
                         var tableObject = document.createElement('table');
@@ -232,20 +242,24 @@
                         tableObject.appendChild(thead);
                         tableObject.appendChild(tbody);
 
-                        document.getElementById('result').appendChild(tableObject);
-                        document.getElementById('result').appendChild(allCallouts);
+                        document.getElementById('output').appendChild(tableObject);
+                        document.getElementById('output').appendChild(allCallouts);
 
                         updateProgessBar(100);
                     }
+                }
 
-                });
+            });
         }
 
         document.getElementById('send').addEventListener('click', function(event) {
             updateProgessBar(0);
-            var url = document.getElementById('url').value;
+            document.getElementById('note').innerHTML = "";
+            document.getElementById('info').innerHTML = "";
+            document.getElementById('output').innerHTML = "";
+            document.getElementById('error').innerHTML = "";
 
-            document.getElementById('result').innerHTML = "";
+            var url = document.getElementById('url').value;
 
             if (!url) {
                 alert('Improper URL');
@@ -253,9 +267,10 @@
                 updateProgessBar(20);
 
                 $.get("/evaluate?url=" + url, function(queueData) {
+                    window.clearInterval(interval);
                     globalObjStatus = 0;
                     queueData = JSON.parse(queueData);
-                    if(queueData && queueData.status){
+                    if (queueData && queueData.status) {
                         updateProgessBar(30);
                         console.log(queueData);
                         var queueCallout = document.createElement('div');
@@ -269,24 +284,24 @@
                         var queuecalloutmessage = document.createElement('p');
 
                         var urlForRef = window.location.protocol + "//";
-                        if(window.location.port !== ""){
-                            urlForRef += window.location.hostname+":"+window.location.port+"/info/"+queueData.id;
-                        }else{
-                            urlForRef += window.location.hostname+"/info/"+queueData.id;
+                        if (window.location.port !== "") {
+                            urlForRef += window.location.hostname + ":" + window.location.port + "/info/" + queueData.id;
+                        } else {
+                            urlForRef += window.location.hostname + "/info/" + queueData.id;
                         }
-                        queuecalloutmessage.innerHTML = "<b>Queue: </b> <code id=\"queueno\"> " + queueData.queue + " </code> <br> <br><b>ID: </b> <code> " + queueData.id + " </code> <br><br> <b>URL (For Future References): </b> <code> " +urlForRef+"</code>";
+                        queuecalloutmessage.innerHTML = "<b>Queue: </b> <code id=\"queueno\"> " + queueData.queue + " </code> <br> <br><b>ID: </b> <code> " + queueData.id +
+                            " </code> <br><br> <b>URL (For Future References): </b> <code> " + urlForRef + "</code>";
 
                         queueCallout.appendChild(queuecalloutheader);
                         queueCallout.appendChild(queuecalloutmessage);
 
-                        document.getElementById('result').appendChild(queueCallout);
+                        document.getElementById('note').appendChild(queueCallout);
+                        checkEvaluationStatus(queueData.id);
 
-                        setInterval(function(){
-                            if(!globalObjStatus){
-                                console.log('Resending Request');
-                                checkEvaluationStatus(queueData.id);
-                            }
-                        }, 5000);
+                        interval = setInterval(function() {
+                            console.log('Resending Request');
+                            checkEvaluationStatus(queueData.id);
+                        }, 3000);
                     }
                 });
             }
