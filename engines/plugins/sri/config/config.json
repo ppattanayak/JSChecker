@@ -1,0 +1,8 @@
+{
+    "phantomjs":{
+        "server":{
+            "port":8082
+        },
+        "temp": "tools/phantomjs/temp"
+    }
+}

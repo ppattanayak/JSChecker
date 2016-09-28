@@ -1,12 +1,17 @@
 var express = require('express');
-var config = require('../src/global').config;
-var redis = require('../src/redis');
+var cache = require('../src/cache');
+var redis = require('../storage/redis');
 var job = require('../src/events');
 var randomstring = require('randomstring');
+var emitter = require('../src/handler');
+
+var config = cache.get('config');
+var emitters = config.emitters;
+var redisConfig = config.storage.redis;
 
 var redisVars = {
-    queue: config.app.redis.Objects.GlobalKeys.taskqueue,
-    defaultValueForIds: config.app.redis.Objects.DefaultTexts.defaultValueForQueue
+    queue: redisConfig.Objects.GlobalKeys.taskqueue,
+    defaultValueForIds: redisConfig.Objects.DefaultTexts.defaultValueForQueue
 };
 var id = "";
 
@@ -19,7 +24,7 @@ function pushToRedis(data, callback){
 
 router.get('/', function(req, res, next) {
     var url = req && req.query && req.query.url;
-    id = config.app.redis.Objects.DefaultTexts.resultObjectPrefix+randomstring.generate(30) + new Date().getTime();
+    id = redisConfig.Objects.DefaultTexts.resultObjectPrefix+randomstring.generate(30) + new Date().getTime();
     console.log('Random String : ', id);
 
     var redisData = {};
@@ -33,8 +38,9 @@ router.get('/', function(req, res, next) {
         console.log('Queue No : ' + result);
         redis.setData(id, redisVars.defaultValueForIds, function(err, result){
             if(err) console.log(err);
-            console.log(result);
+            console.log('Setting Default Value For :'+id, result);
         });
+        // emitter.emit(emitters.newrequest, id, url);
         job.start();
         res.send('{"status":true, "queue":"'+result+'", "id":"'+id+'"}');
     });

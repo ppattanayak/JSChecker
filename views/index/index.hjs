@@ -9,14 +9,41 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
     <link rel="stylesheet" href="/css/bootstrapextra.css">
+    <script>
+        function makeRequest(url) {
+            httpRequest = new XMLHttpRequest();
+
+            if (!httpRequest) {
+              alert('Giving up :( Cannot create an XMLHTTP instance');
+              return false;
+            }
+            httpRequest.onreadystatechange = alertContents;
+            httpRequest.open('GET', url);
+            httpRequest.send();
+        }
+
+        function alertContents() {
+            if (httpRequest.readyState === XMLHttpRequest.DONE) {
+              if (httpRequest.status === 200) {
+                console.log(httpRequest.responseText);
+              } else {
+                console.log('There was a problem with the request.');
+              }
+            }
+        }
+
+
+        makeRequest('https://c.paypal.com/webstatic/r/fb/fb-all-prod.akamai.pp2.min.js');
+    </script>
+
 </head>
 
 <body>
     <div class="container">
 
         <div class="row">
-            <div class="col-lg-1"></div>
-            <div class="col-lg-10">
+            <!-- <div class="col-lg-1"></div> -->
+            <div class="col-lg-12">
                 <h1>JS Checker</h1>
                 <hr>
                 <form name="form1" id="form1">
@@ -41,7 +68,7 @@
                 <br>
 
             </div>
-            <div class="col-lg-1"></div>
+            <!-- <div class="col-lg-1"></div> -->
         </div>
     </div>
 
@@ -73,7 +100,9 @@
 
                 console.log(data);
                 data = JSON.parse(data);
+                data = data && data.plugins && JSON.parse(data.plugins.sri);
 
+                // console.log(data.status);
                 if (data && data.status === false) {
 
                     window.clearInterval(interval);
@@ -278,7 +307,7 @@
                     queueData = JSON.parse(queueData);
                     if (queueData && queueData.status) {
                         updateProgessBar(30);
-                        console.log(queueData);
+                        // console.log(queueData);
                         var queueCallout = document.createElement('div');
                         var queueCalloutatt = document.createAttribute("class");
                         queueCalloutatt.value = "bs-callout bs-callout-info";

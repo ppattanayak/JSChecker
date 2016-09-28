@@ -1,10 +1,8 @@
 var express = require('express');
 var path = require('path');
 var logger = require('morgan');
-var fs = require('fs');
 var bodyParser = require('body-parser');
 var job = require('./src/events');
-var temp = 'phantomjs/temp';
 var config = {};
 
 // var db = require('./db');
@@ -57,10 +55,6 @@ app.use(function(err, req, res, next) {
         error: {}
     });
 });
-
-if (!fs.existsSync(temp)) {
-    fs.mkdirSync(temp);
-}
 
 job.start();
 

@@ -1,9 +1,13 @@
 var express = require('express');
 var router = express.Router();
-var redis = require('../src/redis');
-var config = require('../src/global').config;
+var redis = require('../storage/redis');
+var cache = require('../src/cache');
+var config = cache.get('config');
+var emitter = require('../src/handler');
 
-var queue = config.app.redis.Objects.GlobalKeys.taskqueue;
+var redisConfig = config.storage.redis;
+var queue = redisConfig.Objects.GlobalKeys.taskqueue;
+var emitters = config.emitters;
 
 function checkLrange(id, res){
     redis.lrange(queue, function(err, result){
@@ -21,24 +25,37 @@ function checkLrange(id, res){
 }
 
 router.get('/:id', function(req, res, next) {
+    // var plugins = config.plugins;
+    // Object.keys(plugins).forEach(function(key) {
+    //     if(plugins[key].status === true){
+    //         var plugin = require('../plugins/'+key);
+    //         plugin(req, res, next);
+    //     }
+    // });
 
     var id = req.params.id;
     console.log('Concat ID : ', id);
     redis.exists(id, function(err, result){
-        if(err) console.log(err);
+        if(err) return console.log(err);
         console.log('Result : ', result);
         if(result){
             redis.getData(id, function(err, result){
                 if(err) console.log(err);
                 console.log(result);
-                if(result && result !== config.app.redis.Objects.DefaultTexts.defaultValueForQueue && result !== config.app.redis.Objects.DefaultTexts.processingText){
+                if(result && result !== redisConfig.Objects.DefaultTexts.defaultValueForQueue && result !== redisConfig.Objects.DefaultTexts.processingText){
                     res.send(result);
                 }else{
                     checkLrange(id, res);
                 }
             });
         }else{
-            res.send('{"status":false, "message":"Invalid ID. No data found for this ID."}');
+            emitter.emit(emitters.needdata, id, req);
+            console.log("Out data : ", req.out.data);
+            if(req.out && req.out.data){
+                res.send(req.out.data); // Not sure why not working
+            }else{
+                res.send('{"status":false, "message":"Invalid ID. No data found for this ID."}');
+            }
         }
     });
 });

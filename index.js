@@ -4,12 +4,30 @@
  * Module dependencies.
  */
 
+require('./global');
 var app = require('./app');
 var debug = require('debug');
 var http = require('http');
-var config = require('./src/global').config;
-// var config = require('./config/config.json');
+var emitter = require('./src/handler');
+var colors = require('colors/safe');
+var cache = require('./src/cache');
 
+var config = cache.get('config');
+
+var emitters = config.emitters;
+
+emitter.on(emitters.fatalerror, function(sub, value){
+    console.log(colors.red('Error : '+ sub+ ' - ' + value));
+    process.exit(1);
+});
+
+// Object.keys(enginePlugins).forEach(function(key) {
+//     console.log('================================== Key : ', key);
+//     if(plugins[key].status === true){
+//         require('./plugins/'+key);
+//         console.log("++++++++++++++++++++++++++++++ Plugin Registered : ", key);
+//     }
+// });
 /**
  * Get port from environment and store in Express.
  */

@@ -1,10 +1,16 @@
-var config = require('./global').config;
+var cache = require('../src/cache');
+var emitter = require('../src/handler');
+
+var config = cache.get('config');
+// var config = require('../global').config;
+var emitters = config.emitters;
+var redisConfig = config.storage.redis;
 
 var options = {
-    port: config.app.redis.port,
-    host: config.app.redis.host,
-    password: config.app.redis.authPassword,
-    keyPrefix: config.app.redis.keyPrefix,
+    port: redisConfig.port,
+    host: redisConfig.host,
+    password: redisConfig.authPassword,
+    keyPrefix: redisConfig.keyPrefix,
     dropBufferSupport: true,
     family: 4,
     db: 0
@@ -12,12 +18,21 @@ var options = {
 
 var Redis = require('ioredis');
 var redis = new Redis(options);
-    redis.set(config.app.redis.Objects.GlobalKeys.operationStatusName, 0);
-    redis.set(config.app.redis.Objects.GlobalKeys.intervalStatusVar, 0);
 
-redis.get(config.app.redis.Objects.GlobalKeys.requestServed, function(err, result){
+redis.on('error', function(error){
+    emitter.emit(emitters.fatalerror, 'redis', error);
+});
+
+redis.on('set', function(error){
+    console.log('Setting Redis data');
+});
+
+redis.set(redisConfig.Objects.GlobalKeys.globalOperationStatus, 0);
+redis.set(redisConfig.Objects.GlobalKeys.intervalStatusVar, 0);
+
+redis.get(redisConfig.Objects.GlobalKeys.requestServed, function(err, result){
     if(!result){
-        redis.set(config.app.redis.Objects.GlobalKeys.requestServed, 0, function(err, result){
+        redis.set(redisConfig.Objects.GlobalKeys.requestServed, 0, function(err, result){
             if(err) console.log(err);
             console.log('Setting request server counter to 0 : ', result);
         });

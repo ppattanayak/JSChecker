@@ -1,13 +1,37 @@
 {
-    "phantomjs":{
-        "server":{
-            "port":8082
-        }
-    },
     "app":{
         "server":{
             "port":8080
-        },
+        }
+    },
+    "emitters":{
+        "needdata": "needdata",
+        "newrequest": "newrequest",
+        "runningcheck": "runningcheck",
+        "finished": "finished",
+        "fatalerror": "FatalError"
+    },
+    "engines":{
+        "plugins":{
+            "sri":{
+                "status":true,
+                "priority": 100
+            },
+            "jsprime":{
+                "status": false,
+                "priority": 101
+            },
+            "jslint":{
+                "status": true,
+                "priority": 99
+            },
+            "test":{
+                "status": false,
+                "priority": 103
+            }
+        }
+    },
+    "storage":{
         "redis":{
             "authPassword": "",
             "port": 6379,
@@ -22,11 +46,20 @@
                 },
                 "GlobalKeys":{
                     "taskqueue": "tasks",
-                    "operationStatusName": "GlobalOperationStatus",
+                    "globalOperationStatus": "GlobalOperationStatus",
                     "currentObjectName": "GlobalCurrentObject",
                     "intervalStatusVar": "GlobalIntervalStatus",
                     "requestServed" : "GlobalRequestCounter"
                 }
+            }
+        },
+        "mongo":{
+            "status":true,
+            "priority": 100,
+            "settings":{
+                "host": "127.0.0.1",
+                "port": 27017,
+                "dbname": "jschecker"
             }
         }
     }

@@ -1,31 +1,41 @@
-var redis = require('./redis');
-var tempServer = require('../phantomjs/server');
-var phchecker = require('../phantomjs/checker');
-var config = require('./global').config;
-var queue = config.app.redis.Objects.GlobalKeys.taskqueue;
+var redis = require('../storage/redis');
+var emitter = require('./handler');
+
+var engines = require('../engines');
+var cache = require('./cache');
+
+var config = cache.get('config');
+
+var emitters = config.emitters;
+var redisConfig = config.storage.redis;
+
 var intervalObj;
 
-function updateRedis(sri) {
+function updateRedis(data) {
 
-    redis.getData(config.app.redis.Objects.GlobalKeys.currentObjectName, function(err, result) {
+    redis.getData(redisConfig.Objects.GlobalKeys.currentObjectName, function(err, id) {
         if (err) console.log(err);
-        if (result) {
-            redis.setData(result, sri, function(err, result) { // Storing SRI data into Object
+        if (id) {
+            redis.setData(id, data, function(err, result) { // Storing SRI data into Object
                 if (err) console.log(err);
                 if (result) {
-                    redis.setData(config.app.redis.Objects.GlobalKeys.currentObjectName, '', function(err, result){
+                    // emitter.emit(emitters.finished, id, data);
+                    redis.setData(redisConfig.Objects.GlobalKeys.currentObjectName, '', function(err, result){
                         if(err) console.log(err);
                         console.log('Setting current Object Name to blank: ', result);
                     }); // Removing current Executing Object
-                    redis.setData(config.app.redis.Objects.GlobalKeys.operationStatusName, 0, function(err, result){
+
+                    redis.setData(redisConfig.Objects.GlobalKeys.globalOperationStatus, 0, function(err, result){
                         if(err) console.log(err);
                         console.log('Setting Operation Status to 0: ', result);
                     }); // Setting current execution status to 0
-                    redis.expire(result, config.app.redis.Objects.DefaultTexts.keyLife, function(err, result){
+
+                    redis.expire(id, redisConfig.Objects.DefaultTexts.keyLife, function(err, result){
                         if(err) console.log(err);
-                        console.log('Setting expiry of the key to '+ config.app.redis.Objects.DefaultTexts.keyLife + 's: ', result);
+                        console.log('Setting expiry of the key to '+ redisConfig.Objects.DefaultTexts.keyLife + 's: ', result);
                     }); // Setting key expiry for 24 hours
-                    redis.incr(config.app.redis.Objects.GlobalKeys.requestServed, function(err, result){
+
+                    redis.incr(redisConfig.Objects.GlobalKeys.requestServed, function(err, result){
                         if(err) console.log(err);
                         console.log('Incrementing Request Counter : ', result);
                     });
@@ -39,78 +49,30 @@ function updateRedis(sri) {
     });
 }
 
-function stopServer(status) {
-    if (status === 'success') {
-        console.log('Stop Server method called with success');
-        tempServer.stopServer();
-    } else {
-        console.log('Stop Server method called with failed status');
-        tempServer.stopServer();
-    }
-
-    phchecker.sricheck.evaluateAllUrls(function(sri) {
-        console.log(sri);
-        updateRedis(sri);
-    });
-}
-
-function start() {
-    try {
-        redis.getData(config.app.redis.Objects.GlobalKeys.operationStatusName, function(err, result) {
-            if (err) console.log(err);
-            if (result === '0') {
-                redis.rpop(queue, function(err, redisData) {
-                    redisData = JSON.parse(redisData);
-                    if(redisData){
-                        console.log('Starting new job for ' + redisData.id);
-                        redis.setData(config.app.redis.Objects.GlobalKeys.operationStatusName, 1, function(err, result){
-                            if(err) console.log(err);
-                            console.log(result);
-                        }); // Setting current execution status to 1
-                        redis.setData(redisData.id, config.app.redis.Objects.DefaultTexts.processingText, function(err, result){
-                            if(err) console.log(err);
-                            console.log(result);
-                        }); // Setting Object status to processing
-                        redis.setData(config.app.redis.Objects.GlobalKeys.currentObjectName, redisData.id, function(err, result){
-                            if(err) console.log(err);
-                            console.log(result);
-                        }); // Storing current Executing Object
-                        tempServer.startServer(function() {
-                            phchecker.sricheck.start(redisData.url, function(status) {
-                                stopServer(status);
-                            });
-                        });
-                    }else{
-                        console.log('No Data on found on Redis. Clearing Interval.');
-                        clearInterval(intervalObj);
-                        redis.setData(config.app.redis.Objects.GlobalKeys.intervalStatusVar, 0, function(err, result){
-                            if(err) console.log(err);
-                            console.log('Setting interval status false: ', result);
-                        });
-                    }
-                });
-            }else{
-                console.log('Job already running..');
-            }
-        });
-    } catch (e) {
-        redis.setData(config.app.redis.Objects.GlobalKeys.operationStatusName, 0);
-        console.log(e);
+function handleOutput(output){
+    if(output.status){
+        updateRedis(JSON.stringify(output));
+    }else if(output.code === 101){
+        clearInterval(intervalObj);
+        console.log(output.message);
+    }else{
+        console.log(output.message);
     }
 }
 
 module.exports = {
 
     start: function(){
-        // console.log('Config file used :', app.get('config'));
-        redis.getData(config.app.redis.Objects.GlobalKeys.intervalStatusVar, function(err, result){
-            if(err) console.log(err);
+
+        redis.getData(redisConfig.Objects.GlobalKeys.intervalStatusVar, function(err, result){ // Is setInterval true
+            if(err) return console.log(err);
             if(result === '0'){
                 intervalObj = setInterval(function(){
                     console.log('===================================== Running Job ====================================');
-                    start();
+                    engines.start(handleOutput);
                 }, 3000);
-                redis.setData(config.app.redis.Objects.GlobalKeys.intervalStatusVar, 1, function(err, result){
+
+                redis.setData(redisConfig.Objects.GlobalKeys.intervalStatusVar, 1, function(err, result){
                     if(err) console.log(err);
                     console.log('Setting interval status true : ', result);
                 });
