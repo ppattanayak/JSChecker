@@ -23,8 +23,6 @@ function stopServer(job, status, callback) {
     });
 }
 
-
-
 module.exports = function(job, callback){
     console.log('-------------------------------- ', job);
     tempServer.startServer(function() {

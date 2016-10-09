@@ -46,12 +46,16 @@ function runAllPlugins(redisData, callback){
             runPlugin(localVars.job, function(job, output){
                 // storage.saveData(job.id, output);
                 pluginExecutionCompleted +=1;
-                finalOutput.plugins[job.pluginName] = output;
-                if(pluginExecutionCompleted === plugins.length){
+                if(output && output !== '{}' && output !== {}){
+                    // output = JSON.parse(output);
+                    output.headerName = config.engines.plugins[job.pluginName].name || "No Name";
+                    finalOutput.plugins[job.pluginName] = output || {};
+                    if(pluginExecutionCompleted === plugins.length){
 
-                    finalOutput.status = true;
-                    console.log('Final Output Before Callback : ', finalOutput);
-                    callback(finalOutput);
+                        finalOutput.status = true;
+                        console.log('Final Output Before Callback : ', finalOutput);
+                        callback(finalOutput);
+                    }
                 }
             });
         }else{

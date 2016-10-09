@@ -2,6 +2,7 @@ var cache = require('../src/cache');
 var emitter = require('../src/handler');
 
 var config = cache.get('config');
+
 // var config = require('../global').config;
 var emitters = config.emitters;
 var redisConfig = config.storage.redis;

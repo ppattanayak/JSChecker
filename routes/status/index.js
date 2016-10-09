@@ -1,9 +1,9 @@
 var express = require('express');
 var router = express.Router();
-var redis = require('../storage/redis');
-var cache = require('../src/cache');
+var redis = require('../../storage/redis');
+var cache = require('../../src/cache');
 var config = cache.get('config');
-var emitter = require('../src/handler');
+var emitter = require('../../src/handler');
 
 var redisConfig = config.storage.redis;
 var queue = redisConfig.Objects.GlobalKeys.taskqueue;
@@ -49,13 +49,7 @@ router.get('/:id', function(req, res, next) {
                 }
             });
         }else{
-            emitter.emit(emitters.needdata, id, req);
-            console.log("Out data : ", req.out.data);
-            if(req.out && req.out.data){
-                res.send(req.out.data); // Not sure why not working
-            }else{
-                res.send('{"status":false, "message":"Invalid ID. No data found for this ID."}');
-            }
+            res.send('{"status":false, "message":"Invalid ID. No data found for this ID."}');
         }
     });
 });

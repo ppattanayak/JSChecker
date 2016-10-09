@@ -3,18 +3,23 @@ var path = require('path');
 var logger = require('morgan');
 var bodyParser = require('body-parser');
 var job = require('./src/events');
-var config = {};
+var cache = require('./src/cache');
 
-// var db = require('./db');
+require('marko/node-require').install();
+
+var config = cache.get('config');
+var plugins = config.engines.sortedPlugins;
+var allActivePlugin = [];
 
 var routes = require('./routes/index');
 var evaluate = require('./routes/evaluate');
 var status = require('./routes/status');
 
+
 var app = express();
 
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'hjs');
+// app.set('views', path.join(__dirname, 'routes'));
+// app.set('view engine', 'marko');
 
 app.use(logger('dev'));
 app.use(bodyParser.json());
@@ -27,6 +32,16 @@ app.use('/', routes);
 app.use('/info/:id', routes);
 app.use('/evaluate', evaluate);
 app.use('/status', status);
+
+for(var i = 0; i < plugins.length; i++){
+    console.log('Registering routes for plugin ' + plugins[i].key);
+    var pluginsPath = require('./engines/plugins/'+plugins[i].key+'/routes/index');
+    app.use('/plugins/'+plugins[i].key, pluginsPath);
+    allActivePlugin.push(plugins[i].key);
+    // allActivePlugin.push('Test');
+}
+
+cache.set('allActivePlugin', allActivePlugin);
 
 // init.initial();
 

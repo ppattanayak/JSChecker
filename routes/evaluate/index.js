@@ -1,9 +1,9 @@
 var express = require('express');
-var cache = require('../src/cache');
-var redis = require('../storage/redis');
-var job = require('../src/events');
+var cache = require('../../src/cache');
+var redis = require('../../storage/redis');
+var job = require('../../src/events');
 var randomstring = require('randomstring');
-var emitter = require('../src/handler');
+var emitter = require('../../src/handler');
 
 var config = cache.get('config');
 var emitters = config.emitters;

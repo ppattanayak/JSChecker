@@ -44,13 +44,24 @@ function wgetAndGenerateHash(url, len, callback) {
                 console.log(sri);
                 fs.unlinkSync(filepath);
                 downloaded += 1;
-                if (downloaded === len) callback('{"status":true, "sri":'+JSON.stringify(sri)+'}');
+                if (downloaded === len) {
+                    var result = {};
+                    result.status = true;
+                    result.result = sri;
+                    callback(result);
+                }
             });
         }else{
             fs.unlinkSync(filepath);
             inValidUrls.push(url);
             downloaded += 1;
-            if (downloaded === len) callback('{"status":false, "invalidurls":'+JSON.stringify(inValidUrls)+', "message":"Invalid resources found!!"}');
+            if (downloaded === len) {
+                var result = {};
+                result.status = false;
+                result.invalidurls = inValidUrls;
+                result.message = "Invalid resources found!!";
+                callback(result);
+            }
         }
     });
 }
@@ -135,7 +146,10 @@ module.exports = {
             }
             downloadResources(jsUrls, callback);
         } else {
-            callback('{"status":false, "message":"No Javascript and CSS resources found!!"}');
+            var result = {};
+            result.status = false;
+            result.message = "No Javascript and CSS resources found!!";
+            callback(result);
         }
     }
 };
