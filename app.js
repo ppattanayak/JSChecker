@@ -4,6 +4,8 @@ var logger = require('morgan');
 var bodyParser = require('body-parser');
 var job = require('./src/events');
 var cache = require('./src/cache');
+var fs = require('fs');
+var colors = require('colors/safe');
 
 require('marko/node-require').install();
 
@@ -20,7 +22,7 @@ var app = express();
 
 // app.set('views', path.join(__dirname, 'routes'));
 // app.set('view engine', 'marko');
-
+// app.set('view engine', 'html');
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
@@ -34,10 +36,18 @@ app.use('/evaluate', evaluate);
 app.use('/status', status);
 
 for(var i = 0; i < plugins.length; i++){
-    console.log('Registering routes for plugin ' + plugins[i].key);
-    var pluginsPath = require('./engines/plugins/'+plugins[i].key+'/routes/index');
-    app.use('/plugins/'+plugins[i].key, pluginsPath);
-    allActivePlugin.push(plugins[i].key);
+
+    var moduleIndex = __dirname + '/engines/plugins/'+plugins[i].key+'/routes/index/index.js';
+    if(fs.existsSync(moduleIndex)) {
+        var pluginsPath = require(moduleIndex) || {};
+        app.use('/plugins/'+plugins[i].key, pluginsPath);
+        console.log(colors.green('Registering routes for plugin ' + plugins[i].key));
+        allActivePlugin.push(plugins[i].key);
+    }else{
+        console.log(colors.red('Error : ', plugins[i].key + ' : ', 'No Routes found for the plugin'));
+        process.exit(1);
+    }
+
     // allActivePlugin.push('Test');
 }
 

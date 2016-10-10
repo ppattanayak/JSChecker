@@ -1,6 +1,7 @@
 var merge = require('merge');
 var cache = require('./src/cache');
 var config = require('./config/config.json');
+var fs = require('fs');
 
 for(var i = 0; i < process.argv.length; i++){
     var val = process.argv[i];
@@ -30,7 +31,13 @@ function mergeConfigs(config, callback){
     Object.keys(plugins).forEach(function(key) {
         pluginMerged += 1;
         if(plugins[key].status === true){
-            var pluginConfig = require('./engines/plugins/'+key+'/config/config.json') || {};
+
+            var pluginConfigPath = './engines/plugins/'+key+'/config/config.json';
+            var pluginConfig = {};
+            if (fs.existsSync(pluginConfigPath)) {
+                pluginConfig = require(pluginConfigPath) || {};
+                console.log(pluginConfig);
+            }
             config.engines.plugins[key] = merge.recursive(true, pluginConfig, config.engines.plugins[key]);
         }
         if(pluginMerged === Object.keys(plugins).length){

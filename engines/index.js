@@ -39,17 +39,21 @@ function runAllPlugins(redisData, callback){
 
     for(var i = 0; i < plugins.length; i++){
         var runPlugin = plugins[i];
-        localVars.job.id = redisData.id;
-        localVars.job.url = redisData.url;
-        localVars.job.pluginName = pluginsConfig[i].key;
+        var job = {};
+        job.id = redisData.id;
+        job.url = redisData.url;
+        job.pluginName = pluginsConfig[i].key;
+
         if(typeof runPlugin === 'function'){
-            runPlugin(localVars.job, function(job, output){
+            runPlugin(job, function(rjob, output){
                 // storage.saveData(job.id, output);
+                // console.log('++++++++++++++++++++++++++++++++++ ' + i + ' : ' ,output, ' : ',rjob);
                 pluginExecutionCompleted +=1;
                 if(output && output !== '{}' && output !== {}){
                     // output = JSON.parse(output);
-                    output.headerName = config.engines.plugins[job.pluginName].name || "No Name";
-                    finalOutput.plugins[job.pluginName] = output || {};
+                    output.headerName = config.engines.plugins[rjob.pluginName].name || "No Name";
+                    finalOutput.plugins[rjob.pluginName] = output || {};
+                    // console.log('11111111111111111111111111111111111111111', JSON.stringify(finalOutput));
                     if(pluginExecutionCompleted === plugins.length){
 
                         finalOutput.status = true;

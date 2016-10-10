@@ -11,31 +11,6 @@
     <link rel="stylesheet" href="/css/bootstrapextra.css">
     <script>
 
-        function makeRequest(url) {
-            httpRequest = new XMLHttpRequest();
-
-            if (!httpRequest) {
-              alert('Giving up :( Cannot create an XMLHTTP instance');
-              return false;
-            }
-            httpRequest.onreadystatechange = alertContents;
-            httpRequest.open('GET', url);
-            httpRequest.send();
-        }
-
-        function alertContents(httpRequest, key) {
-
-            if (httpRequest.readyState === XMLHttpRequest.DONE) {
-              if (httpRequest.status === 200) {
-                console.log(httpRequest.responseText);
-                document.getElementById('div'+key).innerHTML = httpRequest.responseText;
-                document.getElementById('output').innerHTML = httpRequest.responseText;
-              } else {
-                console.log('There was a problem with the request.');
-              }
-            }
-        }
-
         function makePluginRequest(url, key, payload){
             httpRequest = new XMLHttpRequest();
 
@@ -43,7 +18,17 @@
               alert('Giving up :( Cannot create an XMLHTTP instance');
               return false;
             }
-            httpRequest.onreadystatechange = function(){alertContents(httpRequest, key)};
+
+            httpRequest.onreadystatechange = function(){
+                if (this.readyState === XMLHttpRequest.DONE) {
+                  if (this.status === 200) {
+                    document.getElementById('div'+key).innerHTML = this.responseText;
+                    display(key);
+                  } else {
+                    console.log('There was a problem with the request.');
+                  }
+                }
+            };
             httpRequest.open("POST", url, true);
             httpRequest.setRequestHeader("Content-type", "application/json");
             httpRequest.send(payload);
@@ -51,8 +36,10 @@
 
         function display(key){
             document.getElementById('output').innerHTML = document.getElementById('div'+key).innerHTML;
-            var allPlugins = ${data.plugins};
-            document.getElementByTagName('li').className = '';
+            var elements = document.getElementsByTagName('li');
+            for(var i = 0; i<elements.length; i++){
+                elements[i].className = '';
+            }
             document.getElementById('li'+key).className = 'active';
         }
     </script>
@@ -201,14 +188,14 @@
                         document.getElementById('note').innerHTML = "";
                         document.getElementById('error').innerHTML = "";
 
-                        var pluginNo = 1;
+                        // var pluginNo = 1;
                         Object.keys(data.plugins).forEach(function(key) {
-                            if(pluginNo === 1){
-                                document.getElementById('li'+key).className = 'active';
-                            }
-                            var payload = '{"result":'+JSON.stringify(data.plugins[key].result)+'}';
+                            // if(pluginNo === 1){
+                            //     document.getElementById('li'+key).className = 'active';
+                            // }
+                            var payload = '{"result":'+JSON.stringify(data.plugins[key])+'}';
                             makePluginRequest('/plugins/'+key, key, payload);
-                            pluginNo++;
+                            // pluginNo++;
                         });
 
                         document.getElementById('urlref').innerHTML = urlRefdiv;
