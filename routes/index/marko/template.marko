@@ -22,6 +22,7 @@
             httpRequest.onreadystatechange = function(){
                 if (this.readyState === XMLHttpRequest.DONE) {
                   if (this.status === 200) {
+
                     document.getElementById('div'+key).innerHTML = this.responseText;
                     display(key);
                   } else {
@@ -74,7 +75,7 @@
 
                 <ul class="nav nav-pills">
                     <for(plugin in data.plugins)>
-                        <li id="li${plugin}" role="presentation" class=""><a href="javascript:display('${plugin}');">${plugin}</a></li>
+                        <li id="li${plugin}" role="presentation" class=""><a id="href${plugin}" href="javascript:display('${plugin}');"></a></li>
                     </for>
                 </ul>
 
@@ -188,14 +189,10 @@
                         document.getElementById('note').innerHTML = "";
                         document.getElementById('error').innerHTML = "";
 
-                        // var pluginNo = 1;
                         Object.keys(data.plugins).forEach(function(key) {
-                            // if(pluginNo === 1){
-                            //     document.getElementById('li'+key).className = 'active';
-                            // }
+                            document.getElementById('href'+key).innerHTML = key.toUpperCase();
                             var payload = '{"result":'+JSON.stringify(data.plugins[key])+'}';
                             makePluginRequest('/plugins/'+key, key, payload);
-                            // pluginNo++;
                         });
 
                         document.getElementById('urlref').innerHTML = urlRefdiv;
@@ -229,7 +226,6 @@
                     queueData = JSON.parse(queueData);
                     if (queueData && queueData.status) {
                         updateProgessBar(30);
-                        // console.log(queueData);
                         var queueCallout = document.createElement('div');
                         var queueCalloutatt = document.createAttribute("class");
                         queueCalloutatt.value = "bs-callout bs-callout-info";
@@ -258,7 +254,6 @@
                         checkEvaluationStatus(queueData.id);
 
                         interval = setInterval(function() {
-                            console.log('Resending Request');
                             checkEvaluationStatus(queueData.id);
                         }, 3000);
                     }

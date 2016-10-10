@@ -8,11 +8,11 @@ var path = require('path');
 /* GET home page. */
 // app.set('views', path.join(__dirname, 'marko'));
 router.get('/', function(req, res, next) {
-  // res.render('index', { title: 'JSChecker' });
+    
+  var plugins = cache.get('allActivePlugin');
   var options = {
       title: "JSChecker",
-      plugins: cache.get('allActivePlugin')
-
+      plugins: plugins
   };
   template.render(options, res);
 });

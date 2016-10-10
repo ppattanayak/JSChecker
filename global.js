@@ -36,7 +36,6 @@ function mergeConfigs(config, callback){
             var pluginConfig = {};
             if (fs.existsSync(pluginConfigPath)) {
                 pluginConfig = require(pluginConfigPath) || {};
-                console.log(pluginConfig);
             }
             config.engines.plugins[key] = merge.recursive(true, pluginConfig, config.engines.plugins[key]);
         }
