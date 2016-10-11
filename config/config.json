@@ -22,7 +22,7 @@
                 "priority": 101
             },
             "jslint":{
-                "status": true,
+                "status": false,
                 "priority": 99
             },
             "test":{
@@ -51,15 +51,6 @@
                     "intervalStatusVar": "GlobalIntervalStatus",
                     "requestServed" : "GlobalRequestCounter"
                 }
-            }
-        },
-        "mongo":{
-            "status":true,
-            "priority": 100,
-            "settings":{
-                "host": "127.0.0.1",
-                "port": 27017,
-                "dbname": "jschecker"
             }
         }
     }

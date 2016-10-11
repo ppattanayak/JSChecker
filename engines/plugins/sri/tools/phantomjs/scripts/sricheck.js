@@ -105,11 +105,13 @@ module.exports = {
                         var info = {};
                         info.headers = headers;
                         for (var i = 0; i < headers.length; i++) {
-                            if (headers[i].name === "Access-Control-Allow-Origin" && headers[i].value === "*") {
+                            var headerName = headers[i].name.toUpperCase();
+                            var accessControlAllowOrigin = 'ACCESS-CONTROL-ALLOW-ORIGIN';
+                            if (headerName === accessControlAllowOrigin && headers[i].value === "*") {
                                 info.status = 1;
                                 info.allowedDomains = headers[i].value;
                                 break;
-                            } else if (headers[i].name === "Access-Control-Allow-Origin" && headers[i].value !== "*") {
+                            } else if (headerName === accessControlAllowOrigin && headers[i].value !== "*") {
                                 info.status = 2;
                                 info.allowedDomains = headers[i].value;
                                 break;

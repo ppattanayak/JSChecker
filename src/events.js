@@ -50,7 +50,7 @@ function updateRedis(data) {
 }
 
 function handleOutput(output){
-    if(output.status){
+    if(output.status || output.code === 102){
         updateRedis(JSON.stringify(output));
     }else if(output.code === 101){
         clearInterval(intervalObj);
