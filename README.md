@@ -16,11 +16,11 @@ JSChecker is a tool to check for various javascript related security requirement
 1. Port (Default : 8080, 8082) : This application uses two ports mentioned. You can change the ports by editing the *config.json* inside the config directory. Make sure the ports are available before you run the application.
 
 2. Redis : Redis configuration is used to manage the redis instance.
-* __host__ : Redis IP address (127.0.0.1 if running locally)
-* __port__ : Redis Port
-* __authPassword__ : Password for connecting to redis.
-* __keyPrefix__ : All the redis keys will start with this prefix.
-* __keyLife__ : How long will be key live in memory.
+    * __host__ : Redis IP address (127.0.0.1 if running locally)
+    * __port__ : Redis Port
+    * __authPassword__ : Password for connecting to redis.
+    * __keyPrefix__ : All the redis keys will start with this prefix.
+    * __keyLife__ : How long will key live in memory.
 
 ## Plugins
 
@@ -33,7 +33,7 @@ You can write your own javascript checker plugin inside the *engines* folder. Yo
 
 ### Data Flow
 
-#### index.js
+#### 1. index.js
 The *index.js* is the entry point to the plugin, where a function needs to exposed accepting two parameters. __job__ and __callback__.
 ```
 module.exports = function(job, callback){
@@ -42,16 +42,16 @@ module.exports = function(job, callback){
     ...
 };
 ```
-__job__ : This is a object with three values mentioned below.
-* ID : This is the request ID, the application has created. This is unique for all requests.
-* URL : This is the JavaScript URL you need to work on.
-* Plugin Name : This is the name of your plugin.
+* __job__ : This is a object with three values mentioned below.
+    * ID : This is the request ID, the application has created. This is unique for all requests.
+    * URL : This is the JavaScript URL you need to work on.
+    * Plugin Name : This is the name of your plugin.
 
-__callback__ : This is the function where the plugin should return the data after processing. It accepts two parameters.
-* Job : This is the same job you received in the above function.
-* Result : The actual JSON object with result. (__Make sure you do not stringify this value. This has to be a JSON object__)
+* __callback__ : This is the function where the plugin should return the data after processing. It accepts two parameters.
+    * Job : This is the same job you received in the above function.
+    * Result : The actual JSON object with result. (__Make sure you do not stringify this value. This has to be a JSON object__)
 
-#### config.json
+#### 2. config.json
 
 You can store anything into the config file you want, which will help your plugin to execute. This will be merged with the application config inside the config directory in application root. The application config have higher precedence over the plugin config. Which means if you have same key inside both, the application config will take higher precedence.
 
@@ -71,7 +71,7 @@ __Sample Config File__
 }
 ```
 
-### Routes directory
+### 3. Routes directory
 The *index.js* file inside your directory should be capable of handling HTTP request. Once you return the result to the callback function in the index.js inside your application root, the application will make a post request call to your plugin which must be handled by the routes index.js. You will have the same result you sent back to the application inside the request object. Which can be accessed as below.
 
 ```
