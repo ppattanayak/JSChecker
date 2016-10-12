@@ -8,8 +8,14 @@ JSChecker is a tool to check for various javascript related security requirement
 
 1. [PhantomJS 2](http://phantomjs.org/download.html)
 2. [Redis](http://redis.io/download)
-4. [NodeJS 4](https://nodejs.org/en/download/)
-5. [openssl](https://www.openssl.org/source/)
+3. [NodeJS 4](https://nodejs.org/en/download/)
+4. [openssl](https://www.openssl.org/source/)
+
+## Usage
+
+```
+node . -p
+```
 
 ## Config
 
@@ -64,7 +70,7 @@ var config = cache.get('config');
 
 You should atleast have your plugin name inside your config.json
 
-__Sample Config File__
+* __Sample Config File__
 ```
 {
     name: <Your_Plugin_Name>
