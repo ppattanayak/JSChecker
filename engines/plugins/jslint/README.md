@@ -2,7 +2,9 @@
 
 ## Requirement
 
-1. npm install jslint --save
+```
+npm install jslint --save
+```
 
 ## Introduction
 
