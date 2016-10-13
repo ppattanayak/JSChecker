@@ -22,8 +22,8 @@
                 "priority": 101
             },
             "jslint":{
-                "status": false,
-                "priority": 99
+                "status": true,
+                "priority": 102
             },
             "test":{
                 "status": false,

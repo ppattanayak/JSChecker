@@ -27,7 +27,7 @@ function stopServer(job, status, callback) {
 
 module.exports = function(job, callback){
     localJob = job;
-    console.log('-------------------------------- ', localJob);
+    // console.log('-------------------------------- ', localJob);
     tempServer.startServer(function() {
         phchecker.sricheck.start(job.url, function(status) {
             stopServer(localJob, status, callback);

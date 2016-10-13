@@ -25,14 +25,6 @@ function checkLrange(id, res){
 }
 
 router.get('/:id', function(req, res, next) {
-    // var plugins = config.plugins;
-    // Object.keys(plugins).forEach(function(key) {
-    //     if(plugins[key].status === true){
-    //         var plugin = require('../plugins/'+key);
-    //         plugin(req, res, next);
-    //     }
-    // });
-
     var id = req.params.id;
     console.log('Concat ID : ', id);
     redis.exists(id, function(err, result){

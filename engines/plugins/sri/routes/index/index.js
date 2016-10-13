@@ -16,7 +16,7 @@ function renderHTML(options, callback){
     for (var i = 0; i < sri.length; i++) {
 
         if (sri[i].headersInfo.status === 0) {
-            data += "<tr class='bg-danger'><td>" + i + "<td>" + sri[i].url + "</td><td>" + sri[i].integrity + "</td><td>None</td></tr>";
+            data += "<tr class='bg-danger'><td>" + (i+1) + "<td>" + sri[i].url + "</td><td>" + sri[i].integrity + "</td><td>None</td></tr>";
             headerData += "<div class='bs-callout bs-callout-danger'><h4>" + sri[i].url + "</h4><b>Note:</b> <code>Access-Control-Allow-Origin</code> header not found. Integrity check for this file cannot be done.";
         } else if (sri[i].headersInfo.status === 1) {
                 data += "<tr class='bg-success'><td>" + i + "<td>" + sri[i].url + "</td><td>" + sri[i].integrity + "</td><td>All Domains</td></tr>";

@@ -8,18 +8,22 @@ var config = cache.get('config');
 
 var emitters = config.emitters;
 var redisConfig = config.storage.redis;
+var colors = require('colors/safe');
 
 var intervalObj;
 
 function updateRedis(data) {
 
+    console.log(colors.cyan('Job Completed resetting redis to deafult: events.js/updateRedis function'));
     redis.getData(redisConfig.Objects.GlobalKeys.currentObjectName, function(err, id) {
-        if (err) console.log(err);
+        if (err) console.log(colors.red(err));
         if (id) {
+            console.log(colors.cyan('Job Completed resetting redis to deafult: events.js/updateRedis:if function'));
             redis.setData(id, data, function(err, result) { // Storing SRI data into Object
                 if (err) console.log(err);
                 if (result) {
                     // emitter.emit(emitters.finished, id, data);
+                    console.log(colors.cyan('Job Completed resetting redis to deafult: events.js/updateRedis:if:setData:if function'));
                     redis.setData(redisConfig.Objects.GlobalKeys.currentObjectName, '', function(err, result){
                         if(err) console.log(err);
                         console.log('Setting current Object Name to blank: ', result);
@@ -41,15 +45,18 @@ function updateRedis(data) {
                     });
                 }else{
                     console.log('Error in setting result');
+                    console.log(colors.cyan('Job Completed resetting redis to deafult: events.js/updateRedis:if:setData:else function'));
                 }
             });
         }else{
             console.log('Error in getting current executing object');
+            console.log(colors.cyan('Job Completed resetting redis to deafult: events.js/updateRedis:else function'));
         }
     });
 }
 
 function handleOutput(output){
+    console.log(colors.cyan('Job Completed reset executing the callback function events.js/handleOutput', JSON.stringify(output)));
     if(output.status || output.code === 102){
         updateRedis(JSON.stringify(output));
     }else if(output.code === 101){
@@ -63,18 +70,27 @@ function handleOutput(output){
 module.exports = {
 
     start: function(){
-
+        var count = 0;
         redis.getData(redisConfig.Objects.GlobalKeys.intervalStatusVar, function(err, result){ // Is setInterval true
             if(err) return console.log(err);
             if(result === '0'){
                 intervalObj = setInterval(function(){
-                    console.log('===================================== Running Job ====================================');
+                    count += 1;
+                    console.log(colors.green('===================================== Running Job No : '+count+' ===================================='));
                     engines.start(handleOutput);
+
+                    if(count === 15){
+                        var output = {};
+                        output.status = false;
+                        output.code = 102;
+                        output.message = "Time Exceeded. Some plugin failed to return response";
+                        handleOutput(output);
+                    }
                 }, 3000);
 
                 redis.setData(redisConfig.Objects.GlobalKeys.intervalStatusVar, 1, function(err, result){
                     if(err) console.log(err);
-                    console.log('Setting interval status true : ', result);
+                    console.log(colors.magenta('Setting interval status true : ', result));
                 });
             }
         });

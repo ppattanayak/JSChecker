@@ -15,7 +15,7 @@ A Sha384 integrity is calculated for every JavaScript
 
 ## Limitation
 
-If the JavaScript makes network call based on some programming logic, adding jquery if its not already added, then this will miss out.
+If the JavaScript makes network call based on some programming logic, adding jquery if its not already added, then the plugin will miss out.
 
 ## Sample Response
 

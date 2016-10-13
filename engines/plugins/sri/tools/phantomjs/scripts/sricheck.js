@@ -26,13 +26,13 @@ function wgetAndGenerateHash(url, len, callback) {
     var command = 'wget --no-check-certificate -O ' + filepath + ' ' + url;
     console.log(command);
     exec(command, function(error, stdout, stderr) {
-        console.log(stdout);
+        // console.log(stdout);
         console.log('Error : ', stderr);
         console.log('Error 1 :', error);
         if (error === null) {
             var cmd = 'openssl dgst -sha384 -binary ' + filepath + ' | openssl base64 -A';
             exec(cmd, function(error, stdout, stderr) {
-                console.log(url + ' : ' + 'sha384-' + stdout);
+                // console.log(url + ' : ' + 'sha384-' + stdout);
                 console.log('Error : ', stderr);
                 sri.push({
                     "url": url,
@@ -41,7 +41,7 @@ function wgetAndGenerateHash(url, len, callback) {
                 }); // Sample Object to Return
 
                 /* {"status":true, "sri":[{"url":"<JS URl>","integrity":"sha384-yGcy15y7ezBTj+bOaB7GnMKa4auQOdAMCIDwZEcjReXG0KL51p1LJPUvA147u05e","headersInfo":{"headers":[{"name":"Date","value":"Wed, 21 Sep 2016 21:06:58 GMT"},{"name":"Server","value":"Apache/2.4.7 (Ubuntu)"},{"name":"Last-Modified","value":"Fri, 02 Sep 2016 22:39:13 GMT"},{"name":"ETag","value":"\"ba-53b8dffe771a0-gzip\""},{"name":"Accept-Ranges","value":"bytes"},{"name":"Vary","value":"Accept-Encoding"},{"name":"Content-Encoding","value":"gzip"},{"name":"Keep-Alive","value":"timeout=5, max=100"},{"name":"Connection","value":"Keep-Alive"},{"name":"Content-Type","value":"application/javascript"}],"status":0,"allowedDomains":"none"}},{"url":"JS URL 2","integrity":"sha384-PELZvjkz6cPUAQaT8DdCeTvtMw2OfoxiYO/paYT5vp6bRXnF06Ka/G3V47lUvWV/","headersInfo":{"headers":[{"name":"Date","value":"Wed, 21 Sep 2016 21:06:58 GMT"},{"name":"Server","value":"Apache/2.4.7 (Ubuntu)"},{"name":"Last-Modified","value":"Fri, 02 Sep 2016 22:38:33 GMT"},{"name":"ETag","value":"\"1d-53b8dfd8d4560\""},{"name":"Accept-Ranges","value":"bytes"},{"name":"Content-Length","value":"29"},{"name":"Keep-Alive","value":"timeout=5, max=99"},{"name":"Connection","value":"Keep-Alive"},{"name":"Content-Type","value":"application/javascript"}],"status":0,"allowedDomains":"none"}}]}*/
-                console.log(sri);
+                // console.log(sri);
                 fs.unlinkSync(filepath);
                 downloaded += 1;
                 if (downloaded === len) {
@@ -69,13 +69,13 @@ function wgetAndGenerateHash(url, len, callback) {
 function downloadResources(urls, callback) {
     console.log('Calculate SRI function');
     exec("pwd", function(error, stdout, stderr) {
-        console.log(stdout);
+        // console.log(stdout);
     });
-    console.log(urls.length);
+    // console.log(urls.length);
     for (var i = 0; i < urls.length; i++) {
         wgetAndGenerateHash(urls[i], urls.length, callback);
     }
-    console.log(sri);
+    // console.log(sri);
 }
 
 
@@ -138,7 +138,7 @@ module.exports = {
     evaluateAllUrls: function(callback) {
 
         var jsUrls = [];
-        console.log('Evaluating all URLs', allUrls);
+        console.log('Evaluating all URLs');
         if (allUrls.length !== 0) {
             console.log('ALL URLS ARE : ', allUrls );
             for (var i = 0; i < allUrls.length; i++) {

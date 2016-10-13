@@ -2,6 +2,7 @@ var cache = require('../src/cache');
 var emitter = require('../src/handler');
 
 var config = cache.get('config');
+var colors = require('colors/safe');
 
 // var config = require('../global').config;
 var emitters = config.emitters;
@@ -42,57 +43,57 @@ redis.get(redisConfig.Objects.GlobalKeys.requestServed, function(err, result){
 
 module.exports = {
     setData: function(key, value, callback) {
-        console.log('Setting Data : ' + key + ' : ' + value);
+        console.log(colors.yellow('Setting Data : ' + key + ' : ' + value));
         redis.set(key, value, callback);
     },
 
     getData: function(key, callback) {
-        console.log('Getting Data : ' + key);
+        console.log(colors.yellow('Getting Data : ' + key));
         redis.get(key, callback);
     },
 
     lpush: function(key, value, callback){
-        console.log('L Pushing Data : ' + key + ' : ' + value);
+        console.log(colors.yellow('L Pushing Data : ' + key + ' : ' + value));
         redis.lpush(key, value, callback);
     },
 
     rpop: function(key, callback){
-        console.log('R Popping Data : ' + key);
+        console.log(colors.yellow('R Popping Data : ' + key));
         redis.rpop(key, callback);
     },
 
     rpush: function(key, value, callback){
-        console.log('R Pushing Data : ' + key + ' : ' + value);
+        console.log(colors.yellow('R Pushing Data : ' + key + ' : ' + value));
         redis.lpush(key, value, callback);
     },
 
     lpop: function(key, callback){
-        console.log('L Popping Data : ' + key);
+        console.log(colors.yellow('L Popping Data : ' + key));
         redis.rpop(key, callback);
     },
 
     lrange: function(key, callback){
-        console.log('LRange Data : ' + key);
+        console.log(colors.yellow('LRange Data : ' + key));
         redis.lrange(key, 0, -1, callback);
     },
 
     exists: function(key, callback) {
-        console.log('Exist Data : ' + key);
+        console.log(colors.yellow('Exist Data : ' + key));
         redis.exists(key, callback);
     },
 
     llen: function(key, callback) {
-        console.log('Length Data : ' + key);
+        console.log(colors.yellow('Length Data : ' + key));
         redis.llen(key, callback);
     },
 
     expire: function(key, time, callback) {
-        console.log('Setting Expire For : ' + key + " to "+ time);
+        console.log(colors.yellow('Setting Expire For : ' + key + " to "+ time));
         redis.expire(key, time, callback);
     },
 
     incr: function(key, callback){
-        console.log('Incrementing : ' + key);
+        console.log(colors.yellow('Incrementing : ' + key));
         redis.incr(key, callback);
     }
 
