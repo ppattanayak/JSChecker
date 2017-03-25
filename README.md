@@ -4,6 +4,26 @@
 
 JSChecker is a tool to check for various javascript related security requirements. This tool is currently under development and more documentation will be updated once it is completed.
 
+## Docker Setup
+```
+docker pull ppattanayak/jschecker
+```
+
+### Run command
+```
+sudo docker run -it -p 58080:8080 ppattanayak/jschecker /root/entrypoint.sh
+```
+
+### Start Command
+```
+sudo docker container start <CONTAINER_ID>
+```
+
+### Attach with Container
+```
+sudo docker attach <CONTAINER_ID>
+```
+
 ## Requirement
 
 1. [PhantomJS 2](http://phantomjs.org/download.html)
